@@ -383,6 +383,39 @@ textarea {
   padding-bottom: 16px;
 }
 
+.toolbar-actions {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.filter-toggle {
+  background: #f5f1ea;
+  border-radius: 8px;
+  display: inline-flex;
+  padding: 4px;
+}
+
+.filter-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #706659;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+}
+
+.filter-btn.active {
+  background: #fff;
+  color: #1b3a4b;
+  box-shadow: 0 2px 6px rgba(27, 58, 75, 0.1);
+}
+
 .photo-grid {
   display: grid;
   gap: 12px;
@@ -483,6 +516,15 @@ textarea {
   .selection-bar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .toolbar-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter-toggle {
+    justify-content: center;
   }
 
   .form-grid,

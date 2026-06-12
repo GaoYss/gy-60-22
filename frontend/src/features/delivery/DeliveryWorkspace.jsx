@@ -1,4 +1,4 @@
-import { Download, Search } from "lucide-react";
+import { Download, Search, Filter } from "lucide-react";
 import { useState } from "react";
 
 import { getDeliveries, getDelivery, saveSelection } from "../../api/client";
@@ -9,6 +9,7 @@ export function DeliveryWorkspace({ deliveries, onDeliveriesChange }) {
   const [delivery, setDelivery] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [message, setMessage] = useState("");
+  const [filterMode, setFilterMode] = useState("all");
 
   async function loadDelivery(event) {
     event.preventDefault();
@@ -18,6 +19,7 @@ export function DeliveryWorkspace({ deliveries, onDeliveriesChange }) {
       const data = await getDelivery(code);
       setDelivery(data);
       setSelectedIds(data.photos.filter((photo) => photo.selected).map((photo) => photo.id));
+      setFilterMode("all");
     } catch (error) {
       setDelivery(null);
       setMessage(error.message);
@@ -81,24 +83,49 @@ export function DeliveryWorkspace({ deliveries, onDeliveriesChange }) {
                     {delivery.client} · {delivery.status} · 精修上限 {delivery.retouchLimit} 张
                   </p>
                 </div>
-                <button className="button button-ghost" type="button">
-                  <Download size={18} />
-                  下载底片
-                </button>
+                <div className="toolbar-actions">
+                  <div className="filter-toggle">
+                    <button
+                      className={`filter-btn ${filterMode === "all" ? "active" : ""}`}
+                      onClick={() => setFilterMode("all")}
+                      type="button"
+                    >
+                      全部
+                    </button>
+                    <button
+                      className={`filter-btn ${filterMode === "selected" ? "active" : ""}`}
+                      onClick={() => setFilterMode("selected")}
+                      type="button"
+                    >
+                      <Filter size={14} />
+                      已选
+                    </button>
+                  </div>
+                  <button className="button button-ghost" type="button">
+                    <Download size={18} />
+                    下载底片
+                  </button>
+                </div>
               </div>
               <div className="photo-grid">
-                {delivery.photos.map((photo) => (
-                  <button
-                    className={`photo-tile ${selectedIds.includes(photo.id) ? "selected" : ""}`}
-                    key={photo.id}
-                    onClick={() => togglePhoto(photo.id)}
-                    type="button"
-                  >
-                    <img src={photo.url} alt={`客片 ${photo.id}`} />
-                    <span>{selectedIds.includes(photo.id) ? "已选择" : "待选择"}</span>
-                  </button>
-                ))}
+                {delivery.photos
+                  .filter((photo) => filterMode === "all" || selectedIds.includes(photo.id))
+                  .map((photo) => (
+                    <button
+                      className={`photo-tile ${selectedIds.includes(photo.id) ? "selected" : ""}`}
+                      key={photo.id}
+                      onClick={() => togglePhoto(photo.id)}
+                      type="button"
+                    >
+                      <img src={photo.url} alt={`客片 ${photo.id}`} />
+                      <span>{selectedIds.includes(photo.id) ? "已选择" : "待选择"}</span>
+                    </button>
+                  ))}
               </div>
+              {filterMode === "selected" &&
+                delivery.photos.filter((photo) => selectedIds.includes(photo.id)).length === 0 && (
+                  <div className="empty-state">暂未选择任何照片，请先点击照片进行选择。</div>
+                )}
               <div className="selection-bar">
                 <span>
                   已选择 {selectedIds.length} / {delivery.retouchLimit} 张
